@@ -1,0 +1,2 @@
+# Run the SSL checker according to the schedule defined in CERT_CHECKER_SCHEDULE
+${CERT_CHECKER_SCHEDULE:-0 8 * * *} root /ssl-checker/check_and_notify.sh >> /var/log/ssl-checker/ssl-checker.log 2>&1
