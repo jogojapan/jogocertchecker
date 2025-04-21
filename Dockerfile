@@ -1,9 +1,12 @@
 FROM jogojapan/jogosmtp
 
 # Install required packages
-RUN apt-get update && \
-    apt-get install -y openssl cron && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache \
+    openssl \
+    bash \
+    coreutils \
+    dcron \
+    tzdata
 
 # Create working directory
 WORKDIR /ssl-checker
