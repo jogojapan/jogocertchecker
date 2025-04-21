@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Create domains.txt from environment variable if provided
+# Generate domains.txt if SSL_DOMAINS is set
 if [ -n "$SSL_DOMAINS" ]; then
     echo "# Domains list generated from SSL_DOMAINS environment variable" > /ssl-checker/domains.txt
     echo "$SSL_DOMAINS" | tr ',' '\n' >> /ssl-checker/domains.txt
@@ -10,6 +10,13 @@ elif [ ! -f /ssl-checker/domains.txt ]; then
     echo "Created empty domains.txt file"
 fi
 
+# Generate crontab dynamically
+: ${CERT_CHECKER_SCHEDULE:="0 8 * * *"}
+echo "Using cron schedule: $CERT_CHECKER_SCHEDULE"
+
+echo "$CERT_CHECKER_SCHEDULE root /ssl-checker/check_and_notify.sh >> /var/log/ssl-checker/ssl-checker.log 2>&1" \
+    > /etc/crontabs/root
+
 # Start cron service
 echo "Starting cron service..."
-exec crond -f
+exec crond -f -L /var/log/ssl-checker/cron.log
