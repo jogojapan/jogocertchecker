@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # ANSI color codes
 RED='\033[0;31m'
@@ -136,7 +136,7 @@ if [ -n "$DOMAIN_LIST_FILE" ]; then
 
     while IFS= read -r domain || [ -n "$domain" ]; do
         # Skip empty lines and lines starting with #
-        if [ -z "$domain" ] || [[ "$domain" == \#* ]]; then
+        if [ -z "$domain" ] || [ "$domain" == \#* ]; then
             continue
         fi
 
