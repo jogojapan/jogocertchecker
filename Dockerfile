@@ -5,7 +5,6 @@ RUN apk add --no-cache \
     openssl \
     bash \
     coreutils \
-    dcron \
     tzdata
 
 # Create working directory
@@ -19,4 +18,4 @@ RUN chmod +x /ssl-checker/*.sh
 RUN mkdir -p /var/log/ssl-checker
 
 # Start services
-CMD ["/ssl-checker/startup.sh"]
+ENTRYPOINT ["/ssl-checker/startup.sh"]

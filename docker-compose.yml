@@ -1,0 +1,14 @@
+services:
+  ssl-checker:
+    image: jogojapan/jogocertchecker:latest
+    environment:
+      - SSL_DOMAINS='domain1.com,sub.domain2.com'
+      - CERT_CHECKER_MAIL_ADDRESS=admin@example.com
+      - MIN_SSL_CERT_EXPIRY=20
+      - CERT_CHECKER_PERIOD_HOURS=24
+    env_file: stack.env
+    volumes:
+      - ./ssl-log:/var/log/ssl-checker
+
+volumes:
+  ssl-log:

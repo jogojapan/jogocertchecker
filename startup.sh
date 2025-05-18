@@ -1,5 +1,7 @@
 #!/bin/sh
 
+/usr/local/bin/configure-msmtp.sh &
+
 # Generate domains.txt if SSL_DOMAINS is set
 if [ -n "$SSL_DOMAINS" ]; then
     echo "# Domains list generated from SSL_DOMAINS environment variable" > /ssl-checker/domains.txt
@@ -10,13 +12,23 @@ elif [ ! -f /ssl-checker/domains.txt ]; then
     echo "Created empty domains.txt file"
 fi
 
-# Generate crontab dynamically
-: ${CERT_CHECKER_SCHEDULE:="0 8 * * *"}
-echo "Using cron schedule: $CERT_CHECKER_SCHEDULE"
+# Set default check period if not specified (24 hours)
+: ${CERT_CHECKER_PERIOD_HOURS:="24"}
 
-echo "$CERT_CHECKER_SCHEDULE root /ssl-checker/check_and_notify.sh >> /var/log/ssl-checker/ssl-checker.log 2>&1" \
-    > /etc/crontabs/root
+# Calculate sleep time in seconds
+SLEEP_TIME=$((CERT_CHECKER_PERIOD_HOURS * 3600))
 
-# Start cron service
-echo "Starting cron service..."
-exec crond -f -L /var/log/ssl-checker/cron.log
+echo "SSL certificate checker will run every ${CERT_CHECKER_PERIOD_HOURS} hours (${SLEEP_TIME} seconds)"
+
+# Run check initially
+echo "Running initial SSL check..."
+/ssl-checker/check_and_notify.sh >> /var/log/ssl-checker/ssl-checker.log 2>&1
+
+# Start the check loop
+echo "Starting check loop..."
+while true; do
+    echo "Sleeping for ${CERT_CHECKER_PERIOD_HOURS} hours..."
+    sleep ${SLEEP_TIME}
+    echo "Running scheduled SSL check..."
+    /ssl-checker/check_and_notify.sh >> /var/log/ssl-checker/ssl-checker.log 2>&1
+done
